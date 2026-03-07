@@ -16,7 +16,7 @@ export default function Home() {
       <main className="flex flex-1 flex-col items-center justify-center px-8 text-center max-w-4xl w-full py-24">
         <div className="flex flex-col gap-8 items-center">
           <span className="text-[10px] font-bold tracking-[0.3em] text-stone-400 uppercase">
-            EST. 2026 
+            EST. 2026 | NHITM
           </span>
           
           <h1 className="text-5xl sm:text-7xl font-serif text-stone-900 leading-[1.1]">
