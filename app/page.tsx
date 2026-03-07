@@ -8,7 +8,7 @@ export default function Home() {
         <h1 className="text-xl font-serif italic tracking-widest uppercase text-stone-900">ArtisanAlley</h1>
         <div className="flex gap-8 text-xs font-medium uppercase tracking-widest text-stone-500">
           <a href="#" className="hover:text-stone-900 transition underline-offset-4 hover:underline">Collection</a>
-          <a href="#" className="hover:text-stone-900 transition underline-offset-4 hover:underline">The Makers</a>
+          <a href="/artisan" className="hover:text-stone-900...">The Makers</a>
           <a href="#" className="hover:text-stone-900 transition underline-offset-4 hover:underline">Story</a>
         </div>
       </nav>
@@ -16,7 +16,7 @@ export default function Home() {
       <main className="flex flex-1 flex-col items-center justify-center px-8 text-center max-w-4xl w-full py-24">
         <div className="flex flex-col gap-8 items-center">
           <span className="text-[10px] font-bold tracking-[0.3em] text-stone-400 uppercase">
-            EST. 2026 — MUMBAI, INDIA
+            EST. 2026 
           </span>
           
           <h1 className="text-5xl sm:text-7xl font-serif text-stone-900 leading-[1.1]">
