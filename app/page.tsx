@@ -60,7 +60,7 @@ export default function Home() {
       </section>
 
       <footer className="w-full py-10 md:py-12 px-6 text-center text-[9px] md:text-[10px] tracking-widest text-stone-400 uppercase leading-loose">
-        © ArtisanAlley Project | <br className="sm:hidden" /> New Horizon Institute Of Technology & Management
+        © ArtisanAlley | <br className="sm:hidden" /> New Horizon Institute Of Technology & Management
       </footer>
     </div>
   );
