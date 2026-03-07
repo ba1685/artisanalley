@@ -9,7 +9,7 @@ export default function Home() {
         <div className="flex gap-8 text-xs font-medium uppercase tracking-widest text-stone-500">
           <a href="#" className="hover:text-stone-900 transition underline-offset-4 hover:underline">Collection</a>
           <a href="/artisan" className="hover:text-stone-900...">The Makers</a>
-          <a href="#" className="hover:text-stone-900 transition underline-offset-4 hover:underline">Story</a>
+          <a href="/story" className="hover:text-stone-900 transition underline-offset-4 hover:underline">Story</a>
         </div>
       </nav>
 
