@@ -6,7 +6,7 @@ export default function StoryPage() {
           Our Philosophy
         </span>
         <h1 className="text-5xl font-serif italic text-center text-stone-900 mb-16">
-          Beyond the Object
+          Beyond the Horizon
         </h1>
 
         <div className="space-y-12 text-lg leading-relaxed font-light text-stone-600">
