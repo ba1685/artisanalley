@@ -58,10 +58,63 @@ export default function Home() {
           </div>
         </div>
       </section>
+{/* Collections Section */}
+<section id="collections" className="py-16 bg-stone-50">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    
+    <div className="mb-12 text-center">
+      <h2 className="text-3xl font-serif font-bold text-stone-900 sm:text-4xl">Explore the Alley</h2>
+      <p className="mt-4 text-lg text-stone-600">Handpicked treasures from local master-makers.</p>
+    </div>
 
-      <footer className="w-full py-10 md:py-12 px-6 text-center text-[9px] md:text-[10px] tracking-widest text-stone-400 uppercase leading-loose">
+    <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+      
+      {/* Collection 1: Pottery */}
+      <div className="group relative cursor-pointer">
+        <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-stone-200 xl:aspect-h-8 xl:aspect-w-7">
+          <img 
+            src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&q=80&w=600" 
+            alt="Handmade Ceramics" 
+            className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-in-out"
+          />
+        </div>
+        <h3 className="mt-4 text-sm text-stone-700">The Clay Studio</h3>
+        <p className="mt-1 text-lg font-medium text-stone-900">Hand-Thrown Pottery</p>
+      </div>
+
+      {/* Collection 2: Textiles */}
+      <div className="group relative cursor-pointer">
+        <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-stone-200 xl:aspect-h-8 xl:aspect-w-7">
+          <img 
+            src="https://images.unsplash.com/photo-1610116306796-6fea9f4fae38?auto=format&fit=crop&q=80&w=600" 
+            alt="Woven Textiles" 
+            className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-in-out"
+          />
+        </div>
+        <h3 className="mt-4 text-sm text-stone-700">The Loom Room</h3>
+        <p className="mt-1 text-lg font-medium text-stone-900">Organic Hand-Woven Silks</p>
+      </div>
+
+      {/* Collection 3: Jewelry */}
+      <div className="group relative cursor-pointer">
+        <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-stone-200 xl:aspect-h-8 xl:aspect-w-7">
+          <img 
+            src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=600" 
+            alt="Artisan Jewelry" 
+            className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-in-out"
+          />
+        </div>
+        <h3 className="mt-4 text-sm text-stone-700">Forge & Fire</h3>
+        <p className="mt-1 text-lg font-medium text-stone-900">Hammered Gold & Silver</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+    <footer className="w-full py-10 md:py-12 px-6 text-center text-[9px] md:text-[10px] tracking-widest text-stone-400 uppercase leading-loose">
         © ArtisanAlley | <br className="sm:hidden" /> New Horizon Institute Of Technology & Management
       </footer>
     </div>
   );
-}
+} 
