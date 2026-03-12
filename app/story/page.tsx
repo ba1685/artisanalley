@@ -22,7 +22,7 @@ export default function StoryPage() {
           </div>
 
           <p>
-            In an age of mass production, the master craftsmen of our city were losing their voice. Our project was born to bridge that gap—connecting the heritage of Dharavi, Kumbharwada, and beyond with the modern world.
+            In an age of mass production, the master craftsmen of our city are losing their voice. Our project was born to bridge that gap—connecting the heritage of Dharavi,Kumbharwada, and beyond with the modern world.
           </p>
 
           <p>
