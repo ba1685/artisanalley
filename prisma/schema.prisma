@@ -1,11 +1,10 @@
-// File: prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -13,18 +12,13 @@ model User {
   name      String
   email     String    @unique
   password  String
-  role      String    @default("CUSTOMER") // Can be "CUSTOMER" or "ARTISAN"
-  bio       String?   
-  artworks  Artwork[] 
+  role      String    @default("ARTISAN")
+  artworks  Artwork[]
 }
 
 model Artwork {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  price       Float
-  imageUrl    String
-  status      String   @default("AVAILABLE")
-  artisanId   String
-  artisan     User     @relation(fields: [artisanId], references: [id])
+  id        String   @id @default(cuid())
+  title     String
+  artisanId String
+  author    User     @relation(fields: [artisanId], references: [id])
 }

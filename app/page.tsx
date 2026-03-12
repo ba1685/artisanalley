@@ -19,7 +19,9 @@ export default function Home() {
       </nav>
 
       
-      <main className="flex flex-1 flex-col items-center justify-center px-6 md:px-8 text-center max-w-4xl w-full py-16 md:py-24">
+      <main className="flex flex-1 flex-col items-center justify-center px-6 md:px-8 text-center max-w-4xl w-full py-16 md:py-24"
+      dat-cur="cursor"
+      >
         <div className="flex flex-col gap-6 md:gap-8 items-center">
           <span className="text-[9px] md:text-[10px] font-bold tracking-[0.2em] md:tracking-[0.3em] text-stone-400 uppercase">
             EST. 2026 — NHITM
