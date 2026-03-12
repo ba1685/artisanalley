@@ -1,15 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, use } from "react";
 import Link from "next/link";
-// 1. IMPORT from your central library
+// Make sure this path is correct based on where your data file is
 import { products } from "@/lib/data"; 
 
-export default function CollectionPage() {
-  // 2. Use the imported 'products' for initial state
+export default function CollectionPage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
+  // Await the artisan ID
+  const resolvedParams = use(params);
+  const id = resolvedParams.id;
+
   const [selectedCategory, setSelectedCategory] = useState<string>("All Crafts");
 
-  // 3. Filter logic now uses the central 'products' array
+  // Filter logic: Currently filters by category from your global 'products'
+  // In a real app, you would also filter by product.artisanId === id
   const filteredProducts = selectedCategory === "All Crafts" 
     ? products 
     : products.filter(product => product.category === selectedCategory);
@@ -19,13 +27,19 @@ export default function CollectionPage() {
       
       {/* Navigation */}
       <nav className="flex w-full flex-col md:flex-row items-center justify-between px-6 md:px-10 py-6 md:py-8 bg-[#FAF9F6]/80 backdrop-blur-md sticky top-0 z-50 border-b border-stone-200 gap-4 md:gap-0">
-        <Link href="/" className="text-lg md:text-xl font-serif italic tracking-widest uppercase text-stone-900">
-          ArtisanAlley
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href={`/artisan/${id}/dashboard`} className="text-lg md:text-xl font-serif italic tracking-widest uppercase text-stone-900">
+            ArtisanAlley
+          </Link>
+          <span className="text-[10px] font-bold tracking-[0.2em] text-stone-400 uppercase hidden sm:block">
+            | My Gallery
+          </span>
+        </div>
+        
         <div className="flex gap-4 md:gap-8 text-[10px] md:text-xs font-medium uppercase tracking-widest text-stone-500">
-          <Link href="/collection" className="text-stone-900 transition underline-offset-4 underline">Collection</Link>
-          <Link href="/artisan" className="hover:text-stone-900 transition underline-offset-4 hover:underline">The Makers</Link>
-          <Link href="/story" className="hover:text-stone-900 transition underline-offset-4 hover:underline">Story</Link>
+          <Link href={`/artisan/${id}/dashboard`} className="hover:text-stone-900 transition underline-offset-4 hover:underline">Dashboard</Link>
+          <Link href={`/artisan/${id}/collection`} className="text-stone-900 transition underline-offset-4 underline">Collection</Link>
+          <Link href={`/artisan/${id}/upload`} className="hover:text-stone-900 transition underline-offset-4 hover:underline">Upload</Link>
         </div>
       </nav>
 
@@ -48,6 +62,11 @@ export default function CollectionPage() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="p-6 bg-stone-100 rounded-lg">
+            <p className="text-[10px] uppercase tracking-widest text-stone-400 mb-2">Artisan ID</p>
+            <p className="text-xs font-mono text-stone-600 truncate">{id}</p>
           </div>
         </aside>
 
@@ -85,6 +104,12 @@ export default function CollectionPage() {
               </div>
             ))}
           </div>
+          
+          {filteredProducts.length === 0 && (
+            <div className="py-20 text-center border-2 border-dashed border-stone-200 rounded-xl">
+              <p className="text-stone-400 italic">No pieces found in this category.</p>
+            </div>
+          )}
         </section>
       </main>
     </div>

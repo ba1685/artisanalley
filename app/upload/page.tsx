@@ -1,18 +1,25 @@
-// File: app/artisan/upload/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, use } from "react"; // Added 'use' to handle params
 import Link from "next/link";
 
-export default function UploadArtworkPage() {
+export default function UploadArtworkPage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
+  // Await the params to get the artisan ID
+  const resolvedParams = use(params);
+  const id = resolvedParams.id;
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Ready to save:", { title, description, price });
-    // In the next step, we will send this to the Prisma database!
+    console.log("Ready to save for artisan:", id, { title, description, price });
+    // Next step: Create a Server Action to save this to Supabase!
   };
 
   return (
@@ -26,7 +33,7 @@ export default function UploadArtworkPage() {
             | Creator Studio
           </span>
         </div>
-        <Link href="/artisan/dashboard" className="text-[10px] font-bold uppercase tracking-widest text-stone-500 hover:text-stone-900 transition-colors underline-offset-4 hover:underline">
+        <Link href={`/artisan/${id}/dashboard`} className="text-[10px] font-bold uppercase tracking-widest text-stone-500 hover:text-stone-900 transition-colors underline-offset-4 hover:underline">
           ← Back to Dashboard
         </Link>
       </nav>
