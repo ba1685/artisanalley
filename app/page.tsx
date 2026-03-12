@@ -18,7 +18,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Main Hero Section - Bringing back the large aesthetic you liked */}
+      
       <main className="flex flex-1 flex-col items-center justify-center px-6 md:px-8 text-center max-w-4xl w-full py-16 md:py-24">
         <div className="flex flex-col gap-6 md:gap-8 items-center">
           <span className="text-[9px] md:text-[10px] font-bold tracking-[0.2em] md:tracking-[0.3em] text-stone-400 uppercase">
@@ -26,9 +26,9 @@ export default function Home() {
           </span>
           
           <h1 className="text-4xl sm:text-7xl font-serif text-stone-900 leading-[1.2] md:leading-[1.1]">
-            The beauty of the <br className="hidden sm:block" /> 
-            <span className="italic">handmade object.</span>
-          </h1>
+  The beauty of the <br className="hidden sm:block" />
+  <span className="italic text-stone-900">handmade object.</span>
+</h1>
           
           <p className="max-w-md md:max-w-lg text-base md:text-lg font-light leading-relaxed text-stone-500 italic">
             A curated marketplace connecting local master artisans with those who appreciate the soul behind the craft.
@@ -44,7 +44,7 @@ export default function Home() {
             Shop the Collection
           </Link>
           <Link 
-            href="/artisan" 
+            href="/artisan-join" 
             className="flex items-center justify-center h-14 px-10 border border-stone-300 bg-transparent text-xs font-bold uppercase tracking-widest hover:bg-[#F5F5DC] transition-all w-full sm:w-auto"
           >
             Join as Artisan
@@ -57,15 +57,15 @@ export default function Home() {
         <div className="max-w-5xl w-full px-6 md:px-10 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 text-center">
           <div className="flex flex-col items-center">
             <h3 className="font-serif italic text-xl mb-2">Sustainable</h3>
-            <p className="text-sm text-stone-500 font-light max-w-[250px]">Ethically sourced materials from local vendors.</p>
+            <p className="text-sm text-stone-500 font-light max-w-62.5">Ethically sourced materials from local vendors.</p>
           </div>
           <div className="flex flex-col items-center">
             <h3 className="font-serif italic text-xl mb-2">Authentic</h3>
-            <p className="text-sm text-stone-500 font-light max-w-[250px]">Directly supporting households.</p>
+            <p className="text-sm text-stone-500 font-light max-w-62.5">Directly supporting households.</p>
           </div>
           <div className="flex flex-col items-center">
             <h3 className="font-serif italic text-xl mb-2">Timeless</h3>
-            <p className="text-sm text-stone-500 font-light max-w-[250px]">Designs meant to last a lifetime, not a season.</p>
+            <p className="text-sm text-stone-500 font-light max-w-62.5">Designs meant to last a lifetime, not a season.</p>
           </div>
         </div>
       </section>

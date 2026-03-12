@@ -1,0 +1,30 @@
+// File: prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      String    @default("CUSTOMER") // Can be "CUSTOMER" or "ARTISAN"
+  bio       String?   
+  artworks  Artwork[] 
+}
+
+model Artwork {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  imageUrl    String
+  status      String   @default("AVAILABLE")
+  artisanId   String
+  artisan     User     @relation(fields: [artisanId], references: [id])
+}
