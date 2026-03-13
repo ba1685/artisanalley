@@ -1,115 +1,95 @@
 "use client";
 
-import { useState, use } from "react";
-import Link from "next/link";
-// Make sure this path is correct based on where your data file is
-import { products } from "@/lib/data"; 
+import React, { useState, useEffect } from 'react';
+import AuthModal from '../../components/AuthModal'; 
 
-export default function CollectionPage({ 
-  params 
-}: { 
-  params: Promise<{ id: string }> 
-}) {
-  // Await the artisan ID
-  const resolvedParams = use(params);
-  const id = resolvedParams.id;
+export default function CollectionPage() {
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  // This state simulates if the user is logged in. Later, this will come from your Auth logic.
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  const categories = ["All Crafts", "Pottery & Clay", "Textiles & Weaves", "Carved Wood"];
 
-  const [selectedCategory, setSelectedCategory] = useState<string>("All Crafts");
+  useEffect(() => {
+    // Show modal on first load if not logged in
+    if (!isLoggedIn) {
+      setIsAuthOpen(true);
+    }
+  }, [isLoggedIn]);
 
-  // Filter logic: Currently filters by category from your global 'products'
-  // In a real app, you would also filter by product.artisanId === id
-  const filteredProducts = selectedCategory === "All Crafts" 
-    ? products 
-    : products.filter(product => product.category === selectedCategory);
+  const handlePurchase = (productName: string) => {
+    if (!isLoggedIn) {
+      // If guest tries to buy, force the login modal
+      setIsAuthOpen(true);
+    } else {
+      // Logic for adding to cart goes here
+      alert(`${productName} added to cart!`);
+    }
+  };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#FAF9F6] font-sans text-stone-800">
-      
-      {/* Navigation */}
-      <nav className="flex w-full flex-col md:flex-row items-center justify-between px-6 md:px-10 py-6 md:py-8 bg-[#FAF9F6]/80 backdrop-blur-md sticky top-0 z-50 border-b border-stone-200 gap-4 md:gap-0">
-        <div className="flex items-center gap-4">
-          <Link href={`/artisan/${id}/dashboard`} className="text-lg md:text-xl font-serif italic tracking-widest uppercase text-stone-900">
-            ArtisanAlley
-          </Link>
-          <span className="text-[10px] font-bold tracking-[0.2em] text-stone-400 uppercase hidden sm:block">
-            | My Gallery
-          </span>
-        </div>
-        
-        <div className="flex gap-4 md:gap-8 text-[10px] md:text-xs font-medium uppercase tracking-widest text-stone-500">
-          <Link href={`/artisan/${id}/dashboard`} className="hover:text-stone-900 transition underline-offset-4 hover:underline">Dashboard</Link>
-          <Link href={`/artisan/${id}/collection`} className="text-stone-900 transition underline-offset-4 underline">Collection</Link>
-          <Link href={`/artisan/${id}/upload`} className="hover:text-stone-900 transition underline-offset-4 hover:underline">Upload</Link>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-[#F9F7F2] text-[#4A443F]">
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 md:px-10 py-12 flex flex-col md:flex-row gap-12">
+      <main className="max-w-7xl mx-auto px-10 py-20 flex gap-20">
         
-        {/* Sidebar Filters */}
-        <aside className="w-full md:w-64 flex flex-col gap-8">
-          <div>
-            <h2 className="text-sm font-bold uppercase tracking-widest text-stone-900 border-b border-stone-300 pb-2 mb-4">
-              Category
-            </h2>
-            <ul className="flex flex-col gap-3 text-sm text-stone-500">
-              {["All Crafts", "Pottery & Clay", "Textiles & Weaves", "Carved Wood"].map((category) => (
-                <li 
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`cursor-pointer transition hover:text-stone-900 ${selectedCategory === category ? "text-stone-900 font-bold" : ""}`}
-                >
-                  {category}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="p-6 bg-stone-100 rounded-lg">
-            <p className="text-[10px] uppercase tracking-widest text-stone-400 mb-2">Artisan ID</p>
-            <p className="text-xs font-mono text-stone-600 truncate">{id}</p>
-          </div>
+        {/* Sidebar */}
+        <aside className="w-60 flex-shrink-0">
+          <h3 className="uppercase tracking-[0.3em] text-[10px] font-bold mb-10 text-[#8C847C] border-b border-[#E5E1DA] pb-3">
+            Category
+          </h3>
+          <ul className="space-y-6">
+            {categories.map((cat) => (
+              <li key={cat} className="cursor-pointer text-[13px] tracking-wide text-[#8C847C] hover:text-[#2C2926] pl-3 transition-colors">
+                {cat}
+              </li>
+            ))}
+          </ul>
         </aside>
 
-        {/* Dynamic Product Grid */}
+        {/* Collection Section */}
         <section className="flex-1">
-          <div className="mb-8 flex justify-between items-end border-b border-stone-200 pb-4">
-            <h1 className="text-3xl font-serif text-stone-900">{selectedCategory}</h1>
-            <span className="text-xs text-stone-500 uppercase tracking-widest">
-              Showing {filteredProducts.length} Items
-            </span>
+          <div className="flex justify-between items-baseline mb-12">
+            <h1 className="text-6xl font-serif text-[#2C2926] italic opacity-90">The Collection</h1>
+            <span className="text-[10px] text-[#A69F96] uppercase tracking-[0.3em] font-medium">3 Items</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="group relative cursor-pointer flex flex-col gap-3">
-                <div className="w-full aspect-[4/5] bg-stone-200 overflow-hidden relative rounded-md">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
-                  {product.badge && (
-                    <div className="absolute top-3 left-3 bg-[#FAF9F6] px-2 py-1 text-[9px] uppercase tracking-widest text-stone-800 shadow-sm">
-                      {product.badge}
-                    </div>
-                  )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
+            
+            {/* Product Card */}
+            <div className="group">
+              <div className="relative aspect-[3/4] overflow-hidden bg-[#F2EFE9] mb-5 shadow-sm">
+                <img 
+                  src="https://images.unsplash.com/photo-1565191999001-551c187427bb?q=80&w=600" 
+                  alt="Pottery" 
+                  className="object-cover w-full h-full opacity-90 transition duration-700 group-hover:scale-105 group-hover:opacity-100"
+                />
+                
+                {/* Overlay Purchase Button - Only visible on hover */}
+                <div className="absolute inset-0 bg-[#2C2926]/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <button 
+                    onClick={() => handlePurchase("Textured Clay Vase")}
+                    className="bg-[#F9F7F2] text-[#2C2926] px-6 py-3 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#2C2926] hover:text-white transition-colors"
+                  >
+                    Purchase Piece
+                  </button>
                 </div>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-stone-900 font-medium">{product.name}</h3>
-                    <p className="text-stone-500 text-xs mt-1">By {product.artisanName}</p>
-                  </div>
-                  <span className="text-stone-900 text-sm">₹{product.price.toLocaleString("en-IN")}</span>
-                </div>
+
+                <span className="absolute top-5 left-5 bg-[#F9F7F2]/90 backdrop-blur-sm px-3 py-1 text-[9px] uppercase tracking-widest font-bold text-[#4A443F]">
+                  Handmade
+                </span>
               </div>
-            ))}
-          </div>
-          
-          {filteredProducts.length === 0 && (
-            <div className="py-20 text-center border-2 border-dashed border-stone-200 rounded-xl">
-              <p className="text-stone-400 italic">No pieces found in this category.</p>
+
+              <div className="flex justify-between items-start px-1">
+                <div>
+                  <h4 className="font-serif text-xl text-[#2C2926]">Textured Clay Vase</h4>
+                  <p className="text-[11px] text-[#8C847C] mt-1 uppercase tracking-wider italic">The Clay Studio</p>
+                </div>
+                <span className="font-serif text-lg text-[#2C2926]">₹1,250</span>
+              </div>
             </div>
-          )}
+
+          </div>
         </section>
       </main>
     </div>

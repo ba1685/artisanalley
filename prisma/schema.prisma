@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "library" 
 }
 
 datasource db {
@@ -7,18 +8,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 1. Enums make roles strict and prevent bugs
+enum Role {
+  CUSTOMER
+  ARTISAN
+}
+
 model User {
   id        String    @id @default(cuid())
   name      String
   email     String    @unique
   password  String
-  role      String    @default("ARTISAN")
+  role      Role      @default(CUSTOMER) // Default changed to Customer for the Shop page
+  
+  // Relations
   artworks  Artwork[]
+  createdAt DateTime  @default(now())
 }
 
 model Artwork {
-  id        String   @id @default(cuid())
-  title     String
-  artisanId String
-  author    User     @relation(fields: [artisanId], references: [id])
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  price       Float    @default(0)
+  imageUrl    String?  // You'll need this to display images in the collection
+  category    String   @default("All Crafts") // Matches your UI sidebar categories
+  
+  // Relation to User (The Artisan)
+  artisanId   String
+  author      User     @relation(fields: [artisanId], references: [id])
+  
+  createdAt   DateTime @default(now())
 }
