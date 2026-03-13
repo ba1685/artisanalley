@@ -86,13 +86,13 @@ export default function UploadArtworkPage({
             {/* Price & Image Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-stone-400 mb-2">Price (USD)</label>
+                <label className="block text-xs font-bold uppercase tracking-widest text-stone-400 mb-2">Price (INR)</label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-stone-400 font-bold">$</span>
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-stone-400 font-bold">₹</span>
                   <input
                     type="number"
                     required
-                    min="1"
+                    min="100"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     className="block w-full rounded-sm border border-stone-200 bg-stone-50 pl-8 pr-4 py-3 text-sm text-stone-900 placeholder:text-stone-300 focus:border-stone-900 focus:outline-none focus:ring-1 focus:ring-stone-900 transition-colors"
