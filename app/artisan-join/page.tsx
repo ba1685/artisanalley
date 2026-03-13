@@ -96,7 +96,7 @@ export default function JoinPage() {
             onClick={() => setIsLogin(!isLogin)} 
             className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 hover:text-black transition-colors"
           >
-            {isLogin ? "Already have an account? Log In" : "Don't have an account? Sign Up"}
+            {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Log In" }
           </button>
         </div>
       </div>

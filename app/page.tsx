@@ -24,7 +24,7 @@ export default function Home() {
       >
         <div className="flex flex-col gap-6 md:gap-8 items-center">
           <span className="text-[9px] md:text-[10px] font-bold tracking-[0.2em] md:tracking-[0.3em] text-stone-400 uppercase">
-            EST. 2026 — NHITM
+            EST. 2026 — NHITM - Comp-A-Group 2
           </span>
           
           <h1 className="text-4xl sm:text-7xl font-serif text-stone-900 leading-[1.2] md:leading-[1.1]">
