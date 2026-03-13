@@ -9,7 +9,9 @@ export default function Home() {
     <div className="flex min-h-screen flex-col items-center bg-[#FAF9F6] font-sans text-stone-800">
       
       {/* Navigation Bar - Sticking to the sleek original look */}
-      <nav className="flex w-full flex-col md:flex-row items-center justify-between px-6 md:px-10 py-6 md:py-8 bg-[#FAF9F6]/80 backdrop-blur-md sticky top-0 z-50 gap-4 md:gap-0">
+      <nav className="flex w-full flex-col md:flex-row items-center justify-between px-6 md:px-10 py-6 md:py-8 bg-[#FAF9F6]/80 backdrop-blur-md sticky top-0 z-50 gap-4 md:gap-0"
+      data-cur="cursor"
+      >
         <h1 className="text-lg md:text-xl font-serif italic tracking-widest uppercase text-stone-900">ArtisanAlley</h1>
         <div className="flex gap-4 md:gap-8 text-[10px] md:text-xs font-medium uppercase tracking-widest text-stone-500">
           <Link href="/collection" className="hover:text-stone-900 transition underline-offset-4 hover:underline">Collection</Link>
