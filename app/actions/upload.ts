@@ -30,13 +30,18 @@ export async function submitArtwork(formData: FormData) {
   }
 
   // 1. Upload Image to Supabase Storage
-  // Create a unique file name so images don't overwrite each other
   const uniqueFilename = `${artisanId}-${Date.now()}-${imageFile.name}`;
+
+  // --- PRODUCTION STABILITY FIX ---
+  // Convert the file to a Buffer so Vercel can handle the stream reliably
+  const arrayBuffer = await imageFile.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
   
   const { data: uploadData, error: uploadError } = await supabase
     .storage
-    .from('artworks') // The bucket name you created in Step 1
-    .upload(uniqueFilename, imageFile, {
+    .from('artworks')
+    .upload(uniqueFilename, buffer, { // Use 'buffer' instead of 'imageFile'
+      contentType: imageFile.type,    // Manually set the type
       cacheControl: '3600',
       upsert: false
     });
