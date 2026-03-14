@@ -59,24 +59,7 @@ export async function submitArtwork(formData: FormData) {
 
   const imageUrl = publicUrlData.publicUrl;
 
-  // --- NEW AUTO-HEAL FIX ---
-  // If Supabase created the user but Prisma doesn't know them yet, sync them!
-  const existingUser = await prisma.user.findUnique({
-    where: { id: artisanId }
-  });
-
-  if (!existingUser) {
-    await prisma.user.create({
-      data: {
-        id: artisanId,
-        name: "My Studio", // Default name until they edit their profile
-        email: `studio-${artisanId.substring(0, 5)}@artisanalley.com`,
-        password: "supabase-auth-linked",
-        role: "ARTISAN"
-      }
-    });
-  }
-  // --------------------------
+ 
 
  // 3. Save to Prisma Database
   await prisma.artwork.create({
@@ -90,7 +73,15 @@ export async function submitArtwork(formData: FormData) {
     },
   });
 
+
+
+  // 1. Clear the cache for the general collection
   revalidatePath('/collection');
-  revalidatePath(`/artisan/${artisanId}/dashboard`); // <-- Add this new line!
+  
+  // 2. Clear the cache for this specific artisan's dashboard
+  // This is the most important line!
+  revalidatePath(`/artisan/${artisanId}/dashboard`, 'page'); 
+  
+  // 3. Now redirect
   redirect(`/artisan/${artisanId}/dashboard`);
 }

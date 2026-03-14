@@ -1,5 +1,5 @@
 "use client";
-
+export const maxDuration = 60; // Applies to Vercel Pro/Hobby
 import React, { useState, use } from 'react';
 import { submitArtwork } from '@/app/actions/upload'; // Adjust path if needed
 

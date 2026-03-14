@@ -32,6 +32,8 @@ export default function Home() {
           <h1 className="text-4xl sm:text-7xl font-serif text-stone-900 leading-[1.2] md:leading-[1.1]">
   The beauty of the <br className="hidden sm:block" />
   <span className="italic text-stone-900">handmade object.</span>
+
+  
 </h1>
           
           <p className="max-w-md md:max-w-lg text-base md:text-lg font-light leading-relaxed text-stone-500 italic">
