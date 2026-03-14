@@ -9,13 +9,15 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 const prisma = globalForPrisma.prisma || new PrismaClient();
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
-// Initialize Supabase Client for Storage
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export async function submitArtwork(formData: FormData) {
+  // Initialize Supabase INSIDE the action. 
+  // Vercel won't run this during build time, solving all our errors!
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
   const price = parseFloat(formData.get("price") as string);
@@ -44,7 +46,7 @@ export async function submitArtwork(formData: FormData) {
     throw new Error("Failed to upload image.");
   }
 
-  // 2. Get the Public URL of the uploaded image
+ // 2. Get the Public URL of the uploaded image
   const { data: publicUrlData } = supabase
     .storage
     .from('artworks')
@@ -52,18 +54,38 @@ export async function submitArtwork(formData: FormData) {
 
   const imageUrl = publicUrlData.publicUrl;
 
-  // 3. Save to Prisma Database
+  // --- NEW AUTO-HEAL FIX ---
+  // If Supabase created the user but Prisma doesn't know them yet, sync them!
+  const existingUser = await prisma.user.findUnique({
+    where: { id: artisanId }
+  });
+
+  if (!existingUser) {
+    await prisma.user.create({
+      data: {
+        id: artisanId,
+        name: "My Studio", // Default name until they edit their profile
+        email: `studio-${artisanId.substring(0, 5)}@artisanalley.com`,
+        password: "supabase-auth-linked",
+        role: "ARTISAN"
+      }
+    });
+  }
+  // --------------------------
+
+ // 3. Save to Prisma Database
   await prisma.artwork.create({
     data: {
       title,
-      description,
-      price,
+      description: description || "", // Ensure description isn't undefined
+      price: Number(price),           // Ensure price is a number
       category,
-      imageUrl: imageUrl, // Save the Supabase URL we just generated
-      artisanId,
+      imageUrl: imageUrl, 
+      artisanId: artisanId,
     },
   });
 
   revalidatePath('/collection');
+  revalidatePath(`/artisan/${artisanId}/dashboard`); // <-- Add this new line!
   redirect(`/artisan/${artisanId}/dashboard`);
 }
