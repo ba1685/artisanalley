@@ -65,15 +65,7 @@ export default function CollectionPage() {
             ))}
           </ul>
           
-          {/* Artisan ID Search Box - Sand Tint */}
-          <div className="mt-20 p-5 bg-[#F2EFE9] border border-[#E5E1DA] rounded-sm">
-            <label className="block text-[9px] tracking-[0.2em] text-[#8C847C] font-bold mb-2">SEARCH BY</label>
-            <input 
-              type="text" 
-              placeholder="ARTISAN ID" 
-              className="w-full bg-transparent border-none text-[11px] tracking-widest focus:ring-0 placeholder-[#B5B0AA] text-[#4A443F] font-bold uppercase outline-none"
-            />
-          </div>
+         
         </aside>
 
         {/* Collection Section */}
