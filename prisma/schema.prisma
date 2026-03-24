@@ -4,11 +4,10 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
 }
 
-// 1. Enums make roles strict and prevent bugs
 enum Role {
   CUSTOMER
   ARTISAN
@@ -19,10 +18,12 @@ model User {
   name      String
   email     String    @unique
   password  String
-  role      Role      @default(CUSTOMER) // Default changed to Customer for the Shop page
+  role      Role      @default(CUSTOMER) 
   
   // Relations
-  artworks  Artwork[]
+  artworks  Artwork[] @relation("ArtisanArtworks") // Artworks they created
+  orders    Order[]   @relation("CustomerOrders")  // Artworks they purchased
+  
   createdAt DateTime  @default(now())
 }
 
@@ -31,12 +32,33 @@ model Artwork {
   title       String
   description String?
   price       Float    @default(0)
-  imageUrl    String?  // You'll need this to display images in the collection
-  category    String   @default("All Crafts") // Matches your UI sidebar categories
+  imageUrl    String?  
+  category    String   @default("All Crafts") 
   
   // Relation to User (The Artisan)
   artisanId   String
-  author      User     @relation(fields: [artisanId], references: [id])
+  author      User     @relation("ArtisanArtworks", fields: [artisanId], references: [id])
+  
+  // Relation to Orders (The Purchases)
+  orders      Order[]
+  
+  createdAt   DateTime @default(now())
+}
+
+// NEW: The Customer Purchase Database
+model Order {
+  id          String   @id @default(cuid())
+  
+  // Who bought it? (The Customer)
+  userId      String
+  customer    User     @relation("CustomerOrders", fields: [userId], references: [id])
+  
+  // What did they buy?
+  artworkId   String
+  artwork     Artwork  @relation(fields: [artworkId], references: [id])
+  
+  amount      Float    // Price at the time of purchase
+  status      String   @default("COMPLETED")
   
   createdAt   DateTime @default(now())
 }

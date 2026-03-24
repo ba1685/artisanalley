@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-// Import your existing auth actions if they are ready
-// import { login, signup } from '@/app/actions/auth'; 
+import { customerSignUp, customerSignIn } from '@/app/actions/auth'; 
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -11,8 +10,27 @@ interface AuthModalProps {
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   
   if (!isOpen) return null;
+
+  async function handleSubmit(formData: FormData) {
+    setIsLoading(true);
+    setError(null);
+
+    const result = mode === 'login' 
+      ? await customerSignIn(formData) 
+      : await customerSignUp(formData);
+
+    setIsLoading(false);
+
+    if (result.error) {
+      setError(result.error);
+    } else if (result.success) {
+      onClose(); // Close the modal and let them continue purchasing
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2C2926]/40 backdrop-blur-md">
@@ -27,30 +45,43 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </p>
         </div>
 
-        <form className="space-y-4">
+        {error && (
+          <div className="mb-4 text-[10px] uppercase tracking-widest text-[#B91C1C] bg-[#FEF2F2] p-3 text-center border border-[#FCA5A5]">
+            {error}
+          </div>
+        )}
+
+        <form action={handleSubmit} className="space-y-4">
           {mode === 'signup' && (
             <input 
               type="text" 
+              name="name"
               placeholder="FULL NAME" 
+              required
               className="w-full p-4 bg-[#F2EFE9] border-none text-[11px] tracking-widest outline-none focus:ring-1 focus:ring-[#4A443F] placeholder-[#B5B0AA]"
             />
           )}
           <input 
             type="email" 
+            name="email"
             placeholder="EMAIL ADDRESS" 
+            required
             className="w-full p-4 bg-[#F2EFE9] border-none text-[11px] tracking-widest outline-none focus:ring-1 focus:ring-[#4A443F] placeholder-[#B5B0AA]"
           />
           <input 
             type="password" 
+            name="password"
             placeholder="PASSWORD" 
+            required
             className="w-full p-4 bg-[#F2EFE9] border-none text-[11px] tracking-widest outline-none focus:ring-1 focus:ring-[#4A443F] placeholder-[#B5B0AA]"
           />
 
           <button 
             type="submit"
-            className="w-full py-4 bg-[#4A443F] text-[#F9F7F2] text-xs uppercase tracking-[0.2em] font-bold hover:bg-[#2C2926] transition-all"
+            disabled={isLoading}
+            className="w-full py-4 bg-[#4A443F] text-[#F9F7F2] text-xs uppercase tracking-[0.2em] font-bold hover:bg-[#2C2926] transition-all disabled:opacity-50"
           >
-            {mode === 'login' ? 'Sign In' : 'Join Community'}
+            {isLoading ? 'PROCESSING...' : (mode === 'login' ? 'Sign In' : 'Join Community')}
           </button>
         </form>
 
@@ -59,7 +90,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             <p>
               New to ArtisanAlley?{' '}
               <span 
-                onClick={() => setMode('signup')} 
+                onClick={() => { setMode('signup'); setError(null); }} 
                 className="text-[#2C2926] font-bold cursor-pointer underline underline-offset-4"
               >
                 Create Account
@@ -69,7 +100,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             <p>
               Already a member?{' '}
               <span 
-                onClick={() => setMode('login')} 
+                onClick={() => { setMode('login'); setError(null); }} 
                 className="text-[#2C2926] font-bold cursor-pointer underline underline-offset-4"
               >
                 Sign In
@@ -87,6 +118,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
         <button 
           onClick={onClose}
+          type="button"
           className="w-full text-[#8C847C] text-[10px] uppercase tracking-[0.2em] font-bold hover:text-[#2C2926] transition-colors"
         >
           Continue as Guest

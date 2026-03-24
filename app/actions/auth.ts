@@ -69,3 +69,77 @@ redirect(`/artisan/${data.user.id}/dashboard?new=true`);
     return { error: "Authentication failed. Please check your credentials." };
   }
 }
+// ... KEEP ALL YOUR ORIGINAL CODE ABOVE THIS LINE ...
+
+// --- NEW CUSTOMER AUTHENTICATION ---
+
+export async function customerSignUp(formData: FormData) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const name = formData.get("name") as string;
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: name } },
+    });
+
+    if (error) return { error: error.message };
+    if (!data.user) return { error: "Failed to create user." };
+
+    // Save to Prisma explicitly as a CUSTOMER
+    await prisma.user.create({
+      data: {
+        id: data.user.id,
+        name: name,
+        email: email,
+        password: "supabase-auth-linked", 
+        role: "CUSTOMER",
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Customer Sign Up Error:", error);
+    return { error: "An unexpected error occurred." };
+  }
+}
+
+export async function customerSignIn(formData: FormData) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) return { error: error.message };
+    if (!data.user) return { error: "User not found." };
+
+    return { success: true };
+  } catch (error) {
+    console.error("Customer Sign In Error:", error);
+    return { error: "An unexpected error occurred." };
+  }
+}
+export async function handleSignOut() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+  await supabase.auth.signOut();
+  return { success: true };
+}
