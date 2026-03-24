@@ -37,7 +37,20 @@ export default function CollectionPage() {
   // CRITICAL: This tracks which piece was clicked for the redirect
   const [selectedArtworkId, setSelectedArtworkId] = useState<string | null>(null);
 
-  const categories = ["All Crafts", "Pottery & Clay", "Textiles & Weaves", "Carved Wood"];
+  // --- UPDATED: 30 New Categories ---
+  const categories = [
+    "All Crafts",
+    "Ceramics & Pottery", "Textiles & Handlooms", "Woodworking & Marquetry",
+    "Glassblowing & Stained Glass", "Metalwork & Forging", "Fine Jewelry & Silversmithing",
+    "Leathercraft & Tooling", "Basketry & Wickerwork", "Paper Arts & Bookbinding",
+    "Stone Carving & Sculpture", "Macramé & Fiber Arts", "Embroidery & Needlework",
+    "Calligraphy & Letterpress", "Printmaking & Linocut", "Mosaic & Inlay Arts",
+    "Bamboo & Rattan", "Folk Art & Tribal Crafts", "Enamel & Cloisonné",
+    "Terracotta & Earthenware", "Tapestry & Rug Making", "Natural Dyeing & Shibori",
+    "Toymaking & Miniatures", "Upcycled & Eco-Art", "Apothecary & Botanicals",
+    "Candlemaking & Wax Arts", "Perfumery & Incense", "Bone & Horn Carving",
+    "Resin & Mixed Media", "Luthier & Instruments"
+  ];
 
   // Check Authentication Status
   const checkUser = useCallback(async () => {
@@ -54,7 +67,7 @@ export default function CollectionPage() {
   }, []);
 
   // Initial Load
-useEffect(() => {
+  useEffect(() => {
     // 1. Load Artworks
     async function loadData() {
       try {
@@ -91,7 +104,7 @@ useEffect(() => {
       }
     });
 
-    // 3. Manual Check on Mount (in case listener missed the initial load)
+    // 3. Manual Check on Mount
     const syncUser = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (authUser) {
@@ -186,16 +199,21 @@ useEffect(() => {
       )}
 
       <main className="max-w-7xl mx-auto px-6 md:px-10 py-10 md:py-20 flex flex-col md:flex-row gap-10 md:gap-20">
+        
+        {/* --- UPDATED: Scrollable Sidebar --- */}
         <aside className="w-full md:w-60 flex-shrink-0">
           <h3 className="uppercase tracking-[0.3em] text-[10px] font-bold mb-6 md:mb-10 text-[#8C847C] border-b border-[#E5E1DA] pb-3 text-center md:text-left">
             Category
           </h3>
-          <ul className="flex flex-row md:flex-col gap-6 md:gap-0 md:space-y-6 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-hide">
+          <ul 
+            className="flex flex-row md:flex-col gap-6 md:gap-0 md:space-y-6 overflow-x-auto md:overflow-y-auto md:max-h-[70vh] pb-4 md:pb-10 scrollbar-hide md:pr-4" 
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
             {categories.map((cat) => (
               <li 
                 key={cat} 
                 onClick={() => setActiveCategory(cat)}
-                className={`cursor-pointer text-[12px] md:text-[13px] tracking-wide transition-all duration-300 whitespace-nowrap ${
+                className={`cursor-pointer text-[12px] md:text-[13px] tracking-wide transition-all duration-300 whitespace-nowrap md:whitespace-normal ${
                   activeCategory === cat 
                   ? "font-bold text-[#2C2926] border-b-2 md:border-b-0 md:border-l-2 border-[#2C2926] pb-1 md:pb-0 md:pl-3" 
                   : "text-[#8C847C] hover:text-[#2C2926] pb-1 md:pb-0 md:pl-3"

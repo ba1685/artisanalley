@@ -42,23 +42,30 @@ model Artwork {
   // Relation to Orders (The Purchases)
   orders      Order[]
   
+  // NEW: Track if the piece has been purchased
+  isSold      Boolean  @default(false)
+  
   createdAt   DateTime @default(now())
 }
 
-// NEW: The Customer Purchase Database
 model Order {
-  id          String   @id @default(cuid())
+  id              String   @id @default(cuid())
   
   // Who bought it? (The Customer)
-  userId      String
-  customer    User     @relation("CustomerOrders", fields: [userId], references: [id])
+  userId          String
+  customer        User     @relation("CustomerOrders", fields: [userId], references: [id])
   
   // What did they buy?
-  artworkId   String
-  artwork     Artwork  @relation(fields: [artworkId], references: [id])
+  artworkId       String
+  artwork         Artwork  @relation(fields: [artworkId], references: [id])
   
-  amount      Float    // Price at the time of purchase
-  status      String   @default("COMPLETED")
+  amount          Float    // Price at the time of purchase
+  status          String   @default("COMPLETED")
   
-  createdAt   DateTime @default(now())
+  // NEW: Shipping Details
+  shippingAddress String
+  city            String
+  postalCode      String
+  
+  createdAt       DateTime @default(now())
 }

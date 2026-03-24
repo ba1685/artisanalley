@@ -2,7 +2,6 @@
 
 export const maxDuration = 60; 
 import React, { useState, use } from 'react';
-// We use useFormStatus to handle the button state inside a sub-component
 import { useFormStatus } from 'react-dom';
 import { submitArtwork } from '@/app/actions/upload';
 
@@ -30,7 +29,19 @@ export default function ArtisanUploadPage({ params }: { params: Promise<{ id: st
   const artisanId = resolvedParams.id;
   const [fileName, setFileName] = useState<string | null>(null);
 
-  const categories = ["Pottery & Clay", "Textiles & Weaves", "Carved Wood"];
+  // UPDATED: The 29 specific artisan categories
+  const categories = [
+    "Ceramics & Pottery", "Textiles & Handlooms", "Woodworking & Marquetry",
+    "Glassblowing & Stained Glass", "Metalwork & Forging", "Fine Jewelry & Silversmithing",
+    "Leathercraft & Tooling", "Basketry & Wickerwork", "Paper Arts & Bookbinding",
+    "Stone Carving & Sculpture", "Macramé & Fiber Arts", "Embroidery & Needlework",
+    "Calligraphy & Letterpress", "Printmaking & Linocut", "Mosaic & Inlay Arts",
+    "Bamboo & Rattan", "Folk Art & Tribal Crafts", "Enamel & Cloisonné",
+    "Terracotta & Earthenware", "Tapestry & Rug Making", "Natural Dyeing & Shibori",
+    "Toymaking & Miniatures", "Upcycled & Eco-Art", "Apothecary & Botanicals",
+    "Candlemaking & Wax Arts", "Perfumery & Incense", "Bone & Horn Carving",
+    "Resin & Mixed Media", "Luthier & Instruments"
+  ];
 
   return (
     <div className="min-h-screen bg-[#F9F7F2] text-[#4A443F] py-20 px-10">
@@ -43,7 +54,6 @@ export default function ArtisanUploadPage({ params }: { params: Promise<{ id: st
           </p>
         </div>
 
-        {/* Note: Ensure submitArtwork is a 'use server' function in your actions file */}
         <form action={submitArtwork} className="space-y-8 bg-[#F2EFE9] p-10 shadow-sm border border-[#E5E1DA]">
           <input type="hidden" name="artisanId" value={artisanId} />
 
@@ -60,7 +70,14 @@ export default function ArtisanUploadPage({ params }: { params: Promise<{ id: st
 
             <div>
               <label className="block text-[10px] uppercase tracking-[0.2em] text-[#8C847C] font-bold mb-3">Category</label>
-              <select name="category" required className="w-full p-4 bg-[#F9F7F2] border border-[#E5E1DA] text-[13px] outline-none focus:border-[#8C847C] transition-colors text-[#2C2926] font-serif">
+              {/* UPDATED: Added defaultValue, appearance-none, and a disabled placeholder option */}
+              <select 
+                name="category" 
+                required 
+                defaultValue=""
+                className="w-full p-4 bg-[#F9F7F2] border border-[#E5E1DA] text-[13px] outline-none focus:border-[#8C847C] transition-colors text-[#2C2926] font-serif appearance-none cursor-pointer"
+              >
+                <option value="" disabled>Select the discipline...</option>
                 {categories.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}

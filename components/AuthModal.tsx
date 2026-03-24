@@ -2,6 +2,13 @@
 
 import React, { useState } from 'react';
 import { customerSignUp, customerSignIn } from '@/app/actions/auth'; 
+import { createClient } from "@supabase/supabase-js";
+
+// Initialize Supabase on the client side to sync the session
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -19,16 +26,30 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     setIsLoading(true);
     setError(null);
 
+    // Grab the credentials so we can log the browser in later
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    // 1. Run the Server Action to handle the Prisma DB
     const result = mode === 'login' 
       ? await customerSignIn(formData) 
       : await customerSignUp(formData);
 
-    setIsLoading(false);
-
     if (result.error) {
       setError(result.error);
-    } else if (result.success) {
-      onClose(); // Close the modal and let them continue purchasing
+      setIsLoading(false);
+      return;
+    } 
+
+    if (result.success) {
+      // 2. THE FIX: Sync the session with the browser!
+      await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      setIsLoading(false);
+      onClose(); // Close the modal and let the CollectionPage take over
     }
   }
 

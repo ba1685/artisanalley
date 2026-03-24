@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 
 export default async function ArtworkDetails({ params }: { params: { id: string } }) {
-  const { id } = await params; // Ensure params are awaited in Next.js 15+
+  const { id } = await params; 
 
   const artwork = await prisma.artwork.findUnique({
     where: { id: id },
@@ -16,7 +16,7 @@ export default async function ArtworkDetails({ params }: { params: { id: string 
     <div className="min-h-screen bg-[#F9F7F2] text-[#4A443F] py-20 px-6 md:px-20">
       <Link 
         href="/collection" 
-        className="text-[10px] uppercase tracking-[0.2em] text-[#8C847C] hover:text-[#2C2926] transition-colors mb-10 inline-block"
+        className="text-[10px] uppercase tracking-[0.2em] text-[#8C847C] hover:text-[#2C2926] transition-colors mb-10 inline-block font-bold"
       >
         ← Back to Collection
       </Link>
@@ -28,7 +28,7 @@ export default async function ArtworkDetails({ params }: { params: { id: string 
             <img 
               src={artwork.imageUrl} 
               alt={artwork.title} 
-              className="w-full h-full object-cover opacity-95 hover:scale-105 transition-transform duration-700"
+              className="w-full h-full object-cover opacity-95 hover:scale-105 transition-transform duration-1000"
             />
           )}
         </div>
@@ -42,9 +42,16 @@ export default async function ArtworkDetails({ params }: { params: { id: string 
             <h1 className="text-5xl md:text-7xl font-serif italic text-[#2C2926] leading-tight">
               {artwork.title}
             </h1>
-            <p className="text-sm text-[#8C847C] mt-4 font-medium uppercase tracking-widest">
+            <p className="text-sm text-[#8C847C] mt-4 font-medium uppercase tracking-widest border-b border-[#E5E1DA] pb-6">
               Crafted by {artwork.author.name}
             </p>
+            
+            {/* --- ADDED DESCRIPTION HERE --- */}
+            {artwork.description && (
+              <div className="mt-8 text-sm md:text-[15px] leading-loose text-[#4A443F] font-serif opacity-90">
+                {artwork.description}
+              </div>
+            )}
           </div>
 
           <div className="py-8 border-y border-[#E5E1DA]">
@@ -57,7 +64,6 @@ export default async function ArtworkDetails({ params }: { params: { id: string 
           </div>
 
           <div className="space-y-4">
-            {/* --- UPDATED PURCHASE BUTTON --- */}
             <Link href={`/checkout/${artwork.id}`} className="block w-full">
               <button className="w-full bg-[#2C2926] text-[#F9F7F2] py-5 text-[12px] uppercase tracking-[0.3em] font-bold hover:bg-[#4A443F] transition-all shadow-lg active:scale-[0.98]">
                 Proceed to Purchase
