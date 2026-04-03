@@ -17,14 +17,22 @@ export async function processOrder(formData: FormData) {
   const postalCode = formData.get("postalCode") as string;
 
   // 1. Find the customer in your User table
-  const customer = await prisma.user.findUnique({
-    where: { email: customerEmail }
+  // 1. Try to find the customer
+  let customer = await prisma.user.findUnique({ 
+    where: { email: customerEmail as string } 
   });
 
+  // 2. If they don't exist, create a profile for them instantly!
   if (!customer) {
-    throw new Error(`Customer with email ${customerEmail} not found in database.`);
+    customer = await prisma.user.create({
+      data: {
+        email: customerEmail as string,
+        name: "Guest Customer", // Default name for guest checkouts
+        password: "guest-checkout", // Dummy password
+        role: "CUSTOMER"
+      }
+    });
   }
-
   // 2. Find the artwork
   const artwork = await prisma.artwork.findUnique({
     where: { id: artworkId },

@@ -19,6 +19,10 @@ export default async function ArtisanDashboard({ params }: { params: Promise<{ i
       artworks: {
         orderBy: {
           createdAt: "desc"
+        },
+        // We must include the orders to calculate the revenue
+        include: {
+          orders: true
         }
       }
     }
@@ -32,12 +36,21 @@ export default async function ArtisanDashboard({ params }: { params: Promise<{ i
     );
   }
 
+  // 1. Calculate Total Artworks
   const totalArtworks = artisan.artworks.length;
-  const totalRevenue = 0; 
+  
+  // 2. Calculate Pieces Sold
+  const piecesSold = artisan.artworks.filter(art => art.isSold).length;
+
+  // 3. Calculate Total Revenue from completed orders
+  const totalRevenue = artisan.artworks.reduce((sum, artwork) => {
+    const artworkRevenue = artwork.orders.reduce((orderSum, order) => {
+      return order.status === "COMPLETED" ? orderSum + order.amount : orderSum;
+    }, 0);
+    return sum + artworkRevenue;
+  }, 0);
 
   return (
-    // Removed the outer flex container and the <aside> entirely. 
-    // Now it just returns the main content to sit neatly next to your layout.tsx sidebar!
     <main className="flex-1 p-10 md:p-16 bg-[#F9F7F2] min-h-screen font-sans text-[#4A443F]">
       
       {/* Header */}
@@ -60,8 +73,8 @@ export default async function ArtisanDashboard({ params }: { params: Promise<{ i
           <h3 className="text-4xl font-serif text-[#2C2926]">{totalArtworks}</h3>
         </div>
         <div className="bg-[#FAF9F6] p-10 rounded-2xl shadow-sm border border-[#E5E1DA]">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-[#A69F96] font-bold mb-4">Gallery Views</p>
-          <h3 className="text-4xl font-serif text-[#2C2926]">0</h3>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-[#A69F96] font-bold mb-4">Pieces Sold</p>
+          <h3 className="text-4xl font-serif text-[#2C2926]">{piecesSold}</h3>
         </div>
         <div className="bg-[#FAF9F6] p-10 rounded-2xl shadow-sm border border-[#E5E1DA]">
           <p className="text-[10px] uppercase tracking-[0.2em] text-[#A69F96] font-bold mb-4">Total Revenue</p>
@@ -81,13 +94,21 @@ export default async function ArtisanDashboard({ params }: { params: Promise<{ i
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {artisan.artworks.map((art) => (
-              <div key={art.id} className="text-left group cursor-pointer">
+              <div key={art.id} className="text-left group cursor-pointer relative">
                 <div className="aspect-[4/5] bg-[#F2EFE9] mb-4 overflow-hidden rounded-lg relative">
+                  
+                  {/* SOLD Tag Overlay */}
+                  {art.isSold && (
+                    <div className="absolute top-4 right-4 bg-[#2C2926] text-[#FAF9F6] text-[9px] uppercase tracking-widest px-3 py-1.5 font-bold z-10 shadow-md">
+                      Sold
+                    </div>
+                  )}
+
                   {art.imageUrl && (
                     <img 
                       src={art.imageUrl} 
                       alt={art.title} 
-                      className="w-full h-full object-cover mix-multiply opacity-90 transition duration-700 group-hover:scale-105 group-hover:opacity-100" 
+                      className={`w-full h-full object-cover mix-multiply transition duration-700 group-hover:scale-105 ${art.isSold ? 'opacity-70 grayscale-[30%]' : 'opacity-90 group-hover:opacity-100'}`} 
                     />
                   )}
                 </div>

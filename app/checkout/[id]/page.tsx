@@ -103,7 +103,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ id: string 
                 <h2 className="text-[10px] uppercase tracking-[0.3em] text-[#8C847C] font-bold mb-8 border-b border-[#E5E1DA] pb-4">Order Summary</h2>
                 
                 <div className="flex gap-6 mb-10">
-                  <div className="w-32 h-44 bg-white border border-[#E5E1DA] overflow-hidden flex-shrink-0 shadow-inner">
+                  <div className="w-32 h-44 bg-white border border-[#E5E1DA] overflow-hidden shrink-0 shadow-inner">
                     {artwork.imageUrl && (
                       <img src={artwork.imageUrl} alt={artwork.title} className="w-full h-full object-cover mix-multiply opacity-95" />
                     )}
