@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import AuthModal from '../../components/AuthModal'; 
 import { getCollectionArtworks } from '../actions/collection';
 import { createClient } from "@supabase/supabase-js";
 
-// Initialize Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -24,23 +24,16 @@ type Artwork = {
 export default function CollectionPage() {
   const router = useRouter();
   
-  // UI States
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Data States
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [activeCategory, setActiveCategory] = useState("All Crafts");
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
-  
-  // CRITICAL: This tracks which piece was clicked for the redirect
   const [selectedArtworkId, setSelectedArtworkId] = useState<string | null>(null);
 
-  // --- UPDATED: 30 New Categories ---
   const categories = [
-    "All Crafts",
-    "Ceramics & Pottery", "Textiles & Handlooms", "Woodworking & Marquetry",
+    "All Crafts", "Ceramics & Pottery", "Textiles & Handlooms", "Woodworking & Marquetry",
     "Glassblowing & Stained Glass", "Metalwork & Forging", "Fine Jewelry & Silversmithing",
     "Leathercraft & Tooling", "Basketry & Wickerwork", "Paper Arts & Bookbinding",
     "Stone Carving & Sculpture", "Macramé & Fiber Arts", "Embroidery & Needlework",
@@ -52,21 +45,21 @@ export default function CollectionPage() {
     "Resin & Mixed Media", "Luthier & Instruments"
   ];
 
-  // Check Authentication Status
+  // Stable checkUser function
   const checkUser = useCallback(async () => {
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (authUser) {
-      setUser({
-        name: authUser.user_metadata?.full_name || "Member",
+      const userData = {
+        name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || "Member",
         email: authUser.email || ""
-      });
+      };
+      setUser(userData);
       return authUser;
     }
     setUser(null);
     return null;
   }, []);
 
-  // Initial Load
   useEffect(() => {
     // 1. Load Artworks
     async function loadData() {
@@ -81,20 +74,15 @@ export default function CollectionPage() {
     }
     loadData();
 
-    // 2. The Aggressive Auth Listener
+    // 2. Auth State Listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Current Auth Event:", event);
-
       if (session?.user) {
-        // We set the user state using email as a fallback if name is missing
         setUser({
           name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || "Member",
           email: session.user.email || ""
         });
-
-        // 3. Handle the Buying Page Redirect
+        // We use a local check for the ID to avoid dependency loops
         if (selectedArtworkId) {
-          console.log("Success! Redirecting to artwork:", selectedArtworkId);
           router.push(`/collection/${selectedArtworkId}`);
           setSelectedArtworkId(null);
         }
@@ -104,36 +92,18 @@ export default function CollectionPage() {
       }
     });
 
-    // 3. Manual Check on Mount
-    const syncUser = async () => {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
-        setUser({
-          name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || "Member",
-          email: authUser.email || ""
-        });
-      }
-    };
-    syncUser();
+    checkUser();
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [selectedArtworkId, router]);
+    return () => subscription.unsubscribe();
+    // Removed checkUser from dependencies to prevent the "changed size" error
+  }, [router, selectedArtworkId]); 
 
-  // Handle Modal Closing & Redirection
   const handleModalClose = async () => {
-    console.log("1. Modal closing...");
     setIsAuthOpen(false);
-    
     const loggedInUser = await checkUser(); 
-
     if (loggedInUser && selectedArtworkId) {
-      console.log("2. User logged in, redirecting to artwork:", selectedArtworkId);
       router.push(`/collection/${selectedArtworkId}`);
-      setSelectedArtworkId(null); // Reset for next time
-    } else {
-      console.log("3. No redirect triggered. User:", !!loggedInUser, "Target ID:", selectedArtworkId);
+      setSelectedArtworkId(null);
     }
   };
 
@@ -152,55 +122,66 @@ export default function CollectionPage() {
     <div className="min-h-screen bg-[#F9F7F2] text-[#4A443F]">
       <AuthModal isOpen={isAuthOpen} onClose={handleModalClose} />
 
-      {/* --- USER BADGE / SIGN IN BUTTON --- */}
-      {user ? (
-        <div className="fixed top-6 right-6 z-50">
-          <button 
-            onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center gap-3 bg-[#F2EFE9] px-4 py-2 border border-[#E5E1DA] shadow-sm hover:bg-[#EBE7E0] transition-all"
-          >
-            <div className="flex flex-col items-end">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#2C2926]">
-                {user.name}
-              </span>
-              <span className="text-[8px] text-[#8C847C] tracking-tighter uppercase font-medium">
-                Member
-              </span>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-[#4A443F] flex items-center justify-center text-[#F9F7F2] text-[10px] font-serif italic">
-              {user.name[0]}
-            </div>
-          </button>
+      <header className="max-w-7xl mx-auto px-6 md:px-10 pt-10 flex justify-between items-center bg-transparent">
+        <Link href="/" className="font-serif text-2xl tracking-[0.1em] text-[#2C2926] italic hover:opacity-70 transition-opacity">
+          ARTISANALLEY
+        </Link>
 
-          {isProfileOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-[#F9F7F2] border border-[#E5E1DA] shadow-xl py-2 animate-in fade-in zoom-in-95 duration-200">
-              <div className="px-4 py-2 border-b border-[#E5E1DA] mb-2">
-                <p className="text-[9px] text-[#8C847C] uppercase tracking-widest">Signed in as</p>
-                <p className="text-[11px] text-[#2C2926] truncate font-medium">{user.email}</p>
-              </div>
+        <div className="flex items-center gap-8">
+          <nav className="hidden md:flex gap-8 text-[10px] uppercase tracking-[0.2em] font-bold text-[#8C847C]">
+            <Link href="/collection" className="text-[#2C2926]">Collection</Link>
+            <Link href="/makers" className="hover:text-[#2C2926] transition-colors">The Makers</Link>
+          </nav>
+
+          {user ? (
+            <div className="relative">
               <button 
-                onClick={handleSignOut}
-                className="w-full text-left px-4 py-2 text-[10px] uppercase tracking-widest text-red-700 hover:bg-red-50 transition-colors font-bold"
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center gap-3 bg-[#F2EFE9] px-4 py-2 border border-[#E5E1DA] shadow-sm hover:bg-[#EBE7E0] transition-all"
               >
-                Sign Out
+                <div className="flex flex-col items-end">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#2C2926]">
+                    {user.name}
+                  </span>
+                  <span className="text-[8px] text-[#8C847C] tracking-tighter uppercase font-medium">
+                    Member
+                  </span>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-[#4A443F] flex items-center justify-center text-[#F9F7F2] text-[10px] font-serif italic">
+                  {user.name[0]}
+                </div>
               </button>
+
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-[#F9F7F2] border border-[#E5E1DA] shadow-xl py-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                  <div className="px-4 py-2 border-b border-[#E5E1DA] mb-2">
+                    <p className="text-[9px] text-[#8C847C] uppercase tracking-widest">Signed in as</p>
+                    <p className="text-[11px] text-[#2C2926] truncate font-medium">{user.email}</p>
+                  </div>
+                  <button 
+                    onClick={handleSignOut}
+                    className="w-full text-left px-4 py-2 text-[10px] uppercase tracking-widest text-red-700 hover:bg-red-50 transition-colors font-bold"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
             </div>
+          ) : (
+            !isLoading && (
+              <button 
+                onClick={() => setIsAuthOpen(true)}
+                className="bg-[#2C2926] text-[#F9F7F2] px-8 py-3 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#4A443F] transition-all shadow-sm"
+              >
+                Sign In
+              </button>
+            )
           )}
         </div>
-      ) : (
-        !isLoading && (
-          <button 
-            onClick={() => setIsAuthOpen(true)}
-            className="fixed top-6 right-6 z-50 bg-[#2C2926] text-[#F9F7F2] px-6 py-2 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#4A443F] transition-all shadow-md"
-          >
-            Sign In
-          </button>
-        )
-      )}
+      </header>
 
-      <main className="max-w-7xl mx-auto px-6 md:px-10 py-10 md:py-20 flex flex-col md:flex-row gap-10 md:gap-20">
+      <main className="max-w-7xl mx-auto px-6 md:px-10 py-12 md:py-20 flex flex-col md:flex-row gap-10 md:gap-20">
         
-        {/* --- UPDATED: Scrollable Sidebar --- */}
         <aside className="w-full md:w-60 flex-shrink-0">
           <h3 className="uppercase tracking-[0.3em] text-[10px] font-bold mb-6 md:mb-10 text-[#8C847C] border-b border-[#E5E1DA] pb-3 text-center md:text-left">
             Category
@@ -246,21 +227,19 @@ export default function CollectionPage() {
                   onClick={async () => {
                     const session = await checkUser();
                     if (session) {
-                      console.log("User already logged in, heading to artwork:", artwork.id);
                       router.push(`/collection/${artwork.id}`);
                     } else {
-                      console.log("Guest clicked artwork, saving ID and opening Modal:", artwork.id);
                       setSelectedArtworkId(artwork.id);
                       setIsAuthOpen(true);
                     }
                   }} 
                 >
-                  <div className="relative aspect-[3/4] overflow-hidden bg-[#F2EFE9] mb-5 shadow-sm">
+                  <div className="relative aspect-[3/4] overflow-hidden bg-[#F2EFE9] mb-5 shadow-sm rounded-sm">
                     {artwork.imageUrl && (
                       <img 
                         src={artwork.imageUrl} 
                         alt={artwork.title} 
-                        className="object-cover w-full h-full mix-multiply opacity-90 transition duration-700 md:group-hover:scale-105"
+                        className="object-cover w-full h-full mix-multiply opacity-95 transition duration-700 md:group-hover:scale-105"
                       />
                     )}
                     <span className="absolute top-4 right-4 bg-[#F9F7F2]/90 backdrop-blur-sm px-2 py-1 text-[8px] uppercase tracking-widest font-bold text-[#4A443F]">

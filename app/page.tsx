@@ -66,6 +66,26 @@ export default async function HomePage() {
               Join as Artisan
             </Link>
           </div>
+
+          
+        </div>
+      </section>
+      {/* --- VALUES BANNER --- */}
+      {/* Updated background color to perfectly match the beige aesthetic */}
+      <section className="bg-[#F2EFE9] border-y border-[#E5E1DA] py-20 px-10">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+          <div>
+            <h3 className="font-serif text-2xl text-[#2C2926] italic mb-4">Sustainable</h3>
+            <p className="text-[11px] text-[#8C847C] uppercase tracking-widest leading-relaxed">Ethically sourced materials from local vendors.</p>
+          </div>
+          <div>
+            <h3 className="font-serif text-2xl text-[#2C2926] italic mb-4">Authentic</h3>
+            <p className="text-[11px] text-[#8C847C] uppercase tracking-widest leading-relaxed">Directly supporting the households of the makers.</p>
+          </div>
+          <div>
+            <h3 className="font-serif text-2xl text-[#2C2926] italic mb-4">Timeless</h3>
+            <p className="text-[11px] text-[#8C847C] uppercase tracking-widest leading-relaxed">Designs meant to last a lifetime, not a season.</p>
+          </div>
         </div>
       </section>
 
@@ -83,9 +103,7 @@ export default async function HomePage() {
             {recentArtworks.map((art) => (
               <Link href={`/collection/${art.id}`} key={art.id} className="group cursor-pointer block">
                 <div className="aspect-[4/5] bg-[#F2EFE9] mb-6 overflow-hidden rounded-lg relative border border-[#E5E1DA]">
-                  {art.isSold && (
-                    <div className="absolute top-4 right-4 bg-[#2C2926] text-[#FAF9F6] text-[9px] uppercase tracking-widest px-3 py-1.5 font-bold z-10 shadow-md">Sold</div>
-                  )}
+                  
                   {art.imageUrl ? (
                     <img src={art.imageUrl} alt={art.title} className="w-full h-full object-cover mix-multiply transition duration-700 group-hover:scale-105" />
                   ) : (

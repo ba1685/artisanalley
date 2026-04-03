@@ -71,11 +71,7 @@ export default async function MakerProfilePage({ params }: { params: Promise<{ i
               {maker.artworks.map((art) => (
                 <Link href={`/collection/${art.id}`} key={art.id} className="text-left group cursor-pointer relative block">
                   <div className="aspect-[4/5] bg-[#F2EFE9] mb-4 overflow-hidden rounded-lg relative border border-[#E5E1DA]">
-                    {art.isSold && (
-                      <div className="absolute top-4 right-4 bg-[#2C2926] text-[#FAF9F6] text-[9px] uppercase tracking-widest px-3 py-1.5 font-bold z-10 shadow-md">
-                        Sold
-                      </div>
-                    )}
+                    
                     {art.imageUrl ? (
                       <img 
                         src={art.imageUrl} 
