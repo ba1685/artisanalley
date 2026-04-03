@@ -35,7 +35,7 @@ export default async function HomePage() {
       {/* --- HERO SECTION --- */}
       <section className="relative min-h-[95vh] flex flex-col items-center justify-center text-center px-6 pt-32 pb-20 overflow-hidden">
         
-        {/* THE LOCAL IMAGE BACKGROUND */}
+      
         <div 
           className="absolute inset-0 z-0 opacity-[0.5] pointer-events-none"
           style={{
@@ -56,7 +56,7 @@ export default async function HomePage() {
             The beauty of the <br/><span className="italic">handmade object.</span>
           </h1>
           <p className="text-sm text-[#8C847C] leading-relaxed max-w-lg mx-auto italic font-serif mb-12 animate-in fade-in slide-in-from-top-8 duration-1000 delay-300">
-            A curated marketplace connecting local master artisans with those who appreciate the soul behind the craft.
+            A curated marketplace connecting local master artisans with those who appreciate the soul behind the craft and the stories they tell.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-500">
             <Link href="/collection" className="bg-[#2C2926] text-[#FAF9F6] px-10 py-5 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#4A443F] transition-colors shadow-sm">
