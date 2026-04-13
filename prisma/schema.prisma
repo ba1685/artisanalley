@@ -6,6 +6,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // CRITICAL: Kept this for your Vercel deployment
 }
 
 enum Role {
@@ -14,21 +15,19 @@ enum Role {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  password      String
-  role          Role      @default(CUSTOMER) 
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  password     String
+  role         Role      @default(CUSTOMER) 
   
-  // NEW: Store Settings Fields
-  profileImage  String?
-  bio           String?
+  profileImage String?
+  bio          String?
 
-  // Relations
-  artworks      Artwork[] @relation("ArtisanArtworks") 
-  orders        Order[]   @relation("CustomerOrders")  
+  artworks     Artwork[] @relation("ArtisanArtworks") 
+  orders       Order[]   @relation("CustomerOrders")  
   
-  createdAt     DateTime  @default(now())
+  createdAt    DateTime  @default(now())
 }
 
 model Artwork {
@@ -39,37 +38,46 @@ model Artwork {
   imageUrl    String?  
   category    String   @default("All Crafts") 
   
-  // Relation to User (The Artisan)
   artisanId   String
   author      User     @relation("ArtisanArtworks", fields: [artisanId], references: [id])
   
-  // Relation to Orders (The Purchases)
-  orders      Order[]
+  // UPDATED: Now relates to OrderItem instead of Order directly
+  orderItems  OrderItem[]
   
-  // NEW: Track if the piece has been purchased
   isSold      Boolean  @default(false)
-  
   createdAt   DateTime @default(now())
 }
 
 model Order {
   id              String   @id @default(cuid())
   
-  // Who bought it? (The Customer)
   userId          String
   customer        User     @relation("CustomerOrders", fields: [userId], references: [id])
   
-  // What did they buy?
-  artworkId       String
-  artwork         Artwork  @relation(fields: [artworkId], references: [id])
+  // FIXED: Added @default(0) to bypass the migration error safely
+  total           Float    @default(0) 
+  status          String   @default("PROCESSING") // UPDATED: Changed default from COMPLETED
+  trackingNumber  String?  // NEW: To show delivery status on profile
   
-  amount          Float    // Price at the time of purchase
-  status          String   @default("COMPLETED")
-  
-  // NEW: Shipping Details
   shippingAddress String
   city            String
   postalCode      String
   
+  // NEW: A single order can now have multiple items inside it
+  items           OrderItem[]
+  
   createdAt       DateTime @default(now())
+}
+
+// NEW MODEL: Represents a single piece of art inside a customer's cart/order
+model OrderItem {
+  id        String   @id @default(cuid())
+  
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  artworkId String
+  artwork   Artwork  @relation(fields: [artworkId], references: [id])
+  
+  price     Float    // We store the price here in case the artisan changes the price later!
 }

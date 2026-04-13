@@ -16,61 +16,69 @@ export async function processOrder(formData: FormData) {
   const city = formData.get("city") as string;
   const postalCode = formData.get("postalCode") as string;
 
-  // 1. Find the customer in your User table
   // 1. Try to find the customer
   let customer = await prisma.user.findUnique({ 
-    where: { email: customerEmail as string } 
+    where: { email: customerEmail } 
   });
 
-  // 2. If they don't exist, create a profile for them instantly!
+  // 2. If they don't exist, create a profile for them instantly
   if (!customer) {
     customer = await prisma.user.create({
       data: {
-        email: customerEmail as string,
-        name: "Guest Customer", // Default name for guest checkouts
+        email: customerEmail,
+        name: "Guest", // Clean default name
         password: "guest-checkout", // Dummy password
         role: "CUSTOMER"
       }
     });
   }
-  // 2. Find the artwork
+
+  // 3. Find the artwork
   const artwork = await prisma.artwork.findUnique({
     where: { id: artworkId },
   });
 
-  if (!artwork || artwork.isSold) {
-    throw new Error("Artwork no longer available.");
+  // We removed the 'isSold' check so you can buy it infinitely!
+  if (!artwork) {
+    throw new Error("Artwork not found.");
   }
 
   try {
-    // 3. Save Order and Mark Sold
-    await prisma.$transaction([
-      prisma.order.create({
-        data: {
-          userId: customer.id,
-          artworkId: artwork.id,
-          amount: artwork.price,
-          status: "COMPLETED",
-          shippingAddress,
-          city,
-          postalCode,
+    // 4. Save Order using the NEW Schema (Order + OrderItem nested creation)
+    await prisma.order.create({
+      data: {
+        userId: customer.id,
+        total: artwork.price, // Uses the new 'total' field
+        status: "PROCESSING", // Matches your Profile page tracking
+        shippingAddress,
+        city,
+        postalCode,
+        // This links the specific artwork to the receipt
+        items: {
+          create: [
+            {
+              artworkId: artwork.id,
+              price: artwork.price
+            }
+          ]
         }
-      }),
-      prisma.artwork.update({
-        where: { id: artwork.id },
-        data: { isSold: true }
-      })
-    ]);
+      }
+    });
+
   } catch (error) {
     console.error("Order error:", error);
     throw new Error("Failed to process transaction.");
   }
 
+  // 5. Refresh the pages so the new data shows up instantly
   revalidatePath('/collection');
-  revalidatePath(`/artisan/${artwork.artisanId}/dashboard`, 'page');
+  revalidatePath(`/artisan/${artwork.artisanId}/dashboard`);
+  revalidatePath('/profile');
   
-  redirect('/collection');
+  // 6. Send them to their new dashboard instead of the collection
+  redirect('/profile');
 }
+
 export async function getArtworkForCheckout(id: string) {
   const artwork = await prisma.artwork.findUnique({
     where: { id },

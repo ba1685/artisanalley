@@ -23,7 +23,7 @@ export default async function ArtworkDetails({ params }: { params: { id: string 
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
         {/* Left: Image Container */}
-        <div className="bg-[#F2EFE9] aspect-[3/4] overflow-hidden shadow-sm border border-[#E5E1DA]">
+        <div className="bg-[#F2EFE9] aspect-3/4 overflow-hidden shadow-sm border border-[#E5E1DA]">
           {artwork.imageUrl && (
             <img 
               src={artwork.imageUrl} 

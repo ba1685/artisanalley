@@ -94,7 +94,7 @@ export default async function ArtisanDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {artisan.artworks.map((art) => (
                 <div key={art.id} className="text-left group cursor-pointer">
-                  <div className="aspect-[4/5] bg-[#F2EFE9] mb-4 overflow-hidden rounded-sm relative">
+                  <div className="aspect-4/5 bg-[#F2EFE9] mb-4 overflow-hidden rounded-sm relative">
                     {art.imageUrl && (
                       <img 
                         src={art.imageUrl} 

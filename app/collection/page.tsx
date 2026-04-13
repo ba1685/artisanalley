@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AuthModal from '../../components/AuthModal'; 
+import ArtConcierge from '../../components/ArtConcierge';
 import { getCollectionArtworks } from '../actions/collection';
 import { createClient } from "@supabase/supabase-js";
 
@@ -119,8 +120,12 @@ export default function CollectionPage() {
     : artworks.filter(art => art.category === activeCategory);
 
   return (
+    
     <div className="min-h-screen bg-[#F9F7F2] text-[#4A443F]">
       <AuthModal isOpen={isAuthOpen} onClose={handleModalClose} />
+      
+      {/* THE CONCIERGE WIDGET ADDED HERE */}
+      <ArtConcierge />
 
       <header className="max-w-7xl mx-auto px-6 md:px-10 pt-10 flex justify-between items-center bg-transparent">
         <Link href="/" className="font-serif text-2xl tracking-[0.1em] text-[#2C2926] italic hover:opacity-70 transition-opacity">
@@ -158,9 +163,18 @@ export default function CollectionPage() {
                     <p className="text-[9px] text-[#8C847C] uppercase tracking-widest">Signed in as</p>
                     <p className="text-[11px] text-[#2C2926] truncate font-medium">{user.email}</p>
                   </div>
+                  
+                  {/* --- NEW: Link to Profile & Orders --- */}
+                  <Link 
+                    href="/profile" 
+                    className="block w-full text-left px-4 py-2 mb-1 text-[10px] uppercase tracking-widest text-[#2C2926] hover:bg-[#F2EFE9] transition-colors font-bold"
+                  >
+                    My Orders
+                  </Link>
+
                   <button 
                     onClick={handleSignOut}
-                    className="w-full text-left px-4 py-2 text-[10px] uppercase tracking-widest text-red-700 hover:bg-red-50 transition-colors font-bold"
+                    className="w-full text-left px-4 py-2 text-[10px] uppercase tracking-widest text-red-700 hover:bg-red-50 transition-colors font-bold border-t border-[#E5E1DA]"
                   >
                     Sign Out
                   </button>
