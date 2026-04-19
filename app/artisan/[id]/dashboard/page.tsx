@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import React from 'react';
 import Link from 'next/link';
+import { deleteArtwork } from '@/app/actions/manageArt';
 import { PrismaClient } from '@prisma/client';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
@@ -20,7 +21,6 @@ export default async function ArtisanDashboard({ params }: { params: Promise<{ i
         orderBy: {
           createdAt: "desc"
         },
-        // FIXED: Replaced 'orders' with 'orderItems' to match the new schema
         include: {
           orderItems: {
             include: {
@@ -104,8 +104,8 @@ export default async function ArtisanDashboard({ params }: { params: Promise<{ i
               const hasBeenSold = art.orderItems.length > 0;
               
               return (
-                <div key={art.id} className="text-left group cursor-pointer relative">
-                  <div className="aspect-4/5 bg-[#F2EFE9] mb-4 overflow-hidden rounded-lg relative">
+                <div key={art.id} className="text-left group relative">
+                  <div className="aspect-4/5 bg-[#F2EFE9] mb-4 overflow-hidden rounded-lg relative border border-[#E5E1DA]">
                     
                     {/* SOLD Tag Overlay */}
                     {hasBeenSold && (
@@ -122,8 +122,39 @@ export default async function ArtisanDashboard({ params }: { params: Promise<{ i
                       />
                     )}
                   </div>
-                  <h4 className="font-serif text-xl text-[#2C2926] group-hover:text-[#8C847C] transition-colors">{art.title}</h4>
-                  <p className="text-[11px] uppercase tracking-widest text-[#8C847C] mt-1">₹{art.price.toLocaleString()}</p>
+                  
+                  {/* Title, Price, and Actions */}
+                  <div className="flex justify-between items-start mt-4 px-1">
+                    <div>
+                      <h4 className="font-serif text-xl text-[#2C2926] transition-colors">{art.title}</h4>
+                      <p className="text-[11px] uppercase tracking-widest text-[#8C847C] mt-1">₹{art.price.toLocaleString()}</p>
+                    </div>
+
+                    <div className="flex flex-col items-end gap-3">
+                      {/* EDIT BUTTON */}
+                      <Link 
+                        href={`/artisan/${artisanId}/edit/${art.id}`} 
+                        className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#2C2926] border-b border-[#2C2926] hover:text-[#8C847C] hover:border-[#8C847C] transition-colors pb-0.5"
+                      >
+                        Edit
+                      </Link>
+
+                      {/* DELETE BUTTON (Only shows if never sold) */}
+                      {!hasBeenSold && (
+                        <form action={deleteArtwork}>
+                          <input type="hidden" name="artworkId" value={art.id} />
+                          <input type="hidden" name="artisanId" value={artisanId} />
+                          <button 
+                            type="submit" 
+                            className="text-[9px] uppercase tracking-[0.2em] font-bold text-red-700 hover:text-red-500 transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </form>
+                      )}
+                    </div>
+                  </div>
+
                 </div>
               );
             })}

@@ -26,10 +26,11 @@ export default async function ArtworkDetails({ params }: { params: { id: string 
         <div className="bg-[#F2EFE9] aspect-3/4 overflow-hidden shadow-sm border border-[#E5E1DA]">
           {artwork.imageUrl && (
             <img 
-              src={artwork.imageUrl} 
-              alt={artwork.title} 
-              className="w-full h-full object-cover opacity-95 hover:scale-105 transition-transform duration-1000"
-            />
+    src={artwork.imageUrl} 
+    alt={artwork.title} 
+    // Changed to object-contain and added p-4 for a nice museum border
+    className="w-full h-full object-contain p-4 mix-multiply" 
+  />
           )}
         </div>
 

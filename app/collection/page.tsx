@@ -13,7 +13,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// Updated type to optionally include createdAt for perfect sorting
 type Artwork = {
   id: string;
   title: string;
@@ -34,8 +33,6 @@ export default function CollectionPage() {
   const [activeCategory, setActiveCategory] = useState("All Crafts");
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [selectedArtworkId, setSelectedArtworkId] = useState<string | null>(null);
-  
-  // NEW: State for sorting
   const [sortOption, setSortOption] = useState("recent");
 
   const categories = [
@@ -115,17 +112,14 @@ export default function CollectionPage() {
     router.refresh();
   };
 
-  // 1. Filter the artworks by category first
   const filteredArtworks = activeCategory === "All Crafts" 
     ? artworks 
     : artworks.filter(art => art.category === activeCategory);
 
-  // 2. Sort the filtered artworks
   const sortedArtworks = [...filteredArtworks].sort((a, b) => {
     if (sortOption === "price-low") return a.price - b.price;
     if (sortOption === "price-high") return b.price - a.price;
     
-    // Default to 'recent' (Assuming newer items have a newer createdAt date or fallback to default DB load order)
     if (sortOption === "recent" && a.createdAt && b.createdAt) {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }
@@ -133,7 +127,6 @@ export default function CollectionPage() {
   });
 
   return (
-    
     <div className="min-h-screen bg-[#F9F7F2] text-[#4A443F]">
       <AuthModal isOpen={isAuthOpen} onClose={handleModalClose} />
       
@@ -232,7 +225,6 @@ export default function CollectionPage() {
         </aside>
 
         <section className="flex-1">
-          {/* UPDATED HEADER: Includes the new Sort Dropdown */}
           <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 gap-6">
             <h1 className="text-4xl md:text-6xl font-serif text-[#2C2926] italic opacity-90">The Collection</h1>
             
@@ -243,7 +235,6 @@ export default function CollectionPage() {
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
                   className="bg-transparent text-[10px] uppercase tracking-[0.1em] font-bold text-[#2C2926] border-b border-[#E5E1DA] pb-1 cursor-pointer focus:outline-none focus:border-[#2C2926] transition-colors appearance-none pr-4"
-                  // Adds a subtle custom dropdown arrow that matches your aesthetic
                   style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232C2926%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 top 50%', backgroundSize: '8px auto' }}
                 >
                   <option value="recent">Added Recently</option>
@@ -258,13 +249,13 @@ export default function CollectionPage() {
             </div>
           </div>
 
-          {isLoading ? (
+         {isLoading ? (
             <div className="text-[#8C847C] text-sm uppercase tracking-widest animate-pulse text-center md:text-left">
               Curating gallery...
             </div>
           ) : (
+            /* --- RESTORED: The Perfect Organized Grid --- */
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-              {/* NOW MAPPING OVER sortedArtworks INSTEAD OF filteredArtworks */}
               {sortedArtworks.map((artwork) => (
                 <div 
                   key={artwork.id} 
@@ -279,11 +270,13 @@ export default function CollectionPage() {
                     }
                   }} 
                 >
-                  <div className="relative aspect-[3/4] overflow-hidden bg-[#F2EFE9] mb-5 shadow-sm rounded-sm">
+                  {/* RESTORED: aspect-square gives wide and tall images equal billing */}
+                  <div className="relative aspect-square overflow-hidden bg-[#F2EFE9] mb-5 shadow-sm rounded-sm">
                     {artwork.imageUrl && (
                       <img 
                         src={artwork.imageUrl} 
                         alt={artwork.title} 
+                        /* RESTORED: object-cover to ensure the grid boxes are completely filled */
                         className="object-cover w-full h-full mix-multiply opacity-95 transition duration-700 md:group-hover:scale-105"
                       />
                     )}
