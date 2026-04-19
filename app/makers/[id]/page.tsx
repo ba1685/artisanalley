@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import React from 'react';
 import Link from 'next/link';
 import { PrismaClient } from '@prisma/client';
@@ -76,7 +78,8 @@ export default async function MakerProfilePage({ params }: { params: Promise<{ i
                       <img 
                         src={art.imageUrl} 
                         alt={art.title} 
-                        className={`w-full h-full object-cover mix-multiply transition duration-700 group-hover:scale-105 ${art.isSold ? 'opacity-70 grayscale-[30%]' : ''}`} 
+                        // FIXED: Removed the art.isSold ternary check completely
+                        className="w-full h-full object-cover mix-multiply transition duration-700 group-hover:scale-105" 
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-[10px] text-[#8C847C] uppercase tracking-widest">No Image</div>

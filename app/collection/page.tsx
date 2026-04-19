@@ -13,6 +13,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+// Updated type to optionally include createdAt for perfect sorting
 type Artwork = {
   id: string;
   title: string;
@@ -20,6 +21,7 @@ type Artwork = {
   imageUrl: string | null;
   category: string;
   author: { name: string };
+  createdAt?: string | Date; 
 };
 
 export default function CollectionPage() {
@@ -32,6 +34,9 @@ export default function CollectionPage() {
   const [activeCategory, setActiveCategory] = useState("All Crafts");
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [selectedArtworkId, setSelectedArtworkId] = useState<string | null>(null);
+  
+  // NEW: State for sorting
+  const [sortOption, setSortOption] = useState("recent");
 
   const categories = [
     "All Crafts", "Ceramics & Pottery", "Textiles & Handlooms", "Woodworking & Marquetry",
@@ -46,7 +51,6 @@ export default function CollectionPage() {
     "Resin & Mixed Media", "Luthier & Instruments"
   ];
 
-  // Stable checkUser function
   const checkUser = useCallback(async () => {
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (authUser) {
@@ -62,7 +66,6 @@ export default function CollectionPage() {
   }, []);
 
   useEffect(() => {
-    // 1. Load Artworks
     async function loadData() {
       try {
         const data = await getCollectionArtworks();
@@ -75,14 +78,12 @@ export default function CollectionPage() {
     }
     loadData();
 
-    // 2. Auth State Listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUser({
           name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || "Member",
           email: session.user.email || ""
         });
-        // We use a local check for the ID to avoid dependency loops
         if (selectedArtworkId) {
           router.push(`/collection/${selectedArtworkId}`);
           setSelectedArtworkId(null);
@@ -96,8 +97,7 @@ export default function CollectionPage() {
     checkUser();
 
     return () => subscription.unsubscribe();
-    // Removed checkUser from dependencies to prevent the "changed size" error
-  }, [router, selectedArtworkId]); 
+  }, [router, selectedArtworkId, checkUser]); 
 
   const handleModalClose = async () => {
     setIsAuthOpen(false);
@@ -115,16 +115,28 @@ export default function CollectionPage() {
     router.refresh();
   };
 
+  // 1. Filter the artworks by category first
   const filteredArtworks = activeCategory === "All Crafts" 
     ? artworks 
     : artworks.filter(art => art.category === activeCategory);
+
+  // 2. Sort the filtered artworks
+  const sortedArtworks = [...filteredArtworks].sort((a, b) => {
+    if (sortOption === "price-low") return a.price - b.price;
+    if (sortOption === "price-high") return b.price - a.price;
+    
+    // Default to 'recent' (Assuming newer items have a newer createdAt date or fallback to default DB load order)
+    if (sortOption === "recent" && a.createdAt && b.createdAt) {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    return 0; 
+  });
 
   return (
     
     <div className="min-h-screen bg-[#F9F7F2] text-[#4A443F]">
       <AuthModal isOpen={isAuthOpen} onClose={handleModalClose} />
       
-      {/* THE CONCIERGE WIDGET ADDED HERE */}
       <ArtConcierge />
 
       <header className="max-w-7xl mx-auto px-6 md:px-10 pt-10 flex justify-between items-center bg-transparent">
@@ -164,7 +176,6 @@ export default function CollectionPage() {
                     <p className="text-[11px] text-[#2C2926] truncate font-medium">{user.email}</p>
                   </div>
                   
-                  {/* --- NEW: Link to Profile & Orders --- */}
                   <Link 
                     href="/profile" 
                     className="block w-full text-left px-4 py-2 mb-1 text-[10px] uppercase tracking-widest text-[#2C2926] hover:bg-[#F2EFE9] transition-colors font-bold"
@@ -221,11 +232,30 @@ export default function CollectionPage() {
         </aside>
 
         <section className="flex-1">
-          <div className="flex flex-col md:flex-row justify-between items-center md:items-baseline mb-12 gap-4">
+          {/* UPDATED HEADER: Includes the new Sort Dropdown */}
+          <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 gap-6">
             <h1 className="text-4xl md:text-6xl font-serif text-[#2C2926] italic opacity-90">The Collection</h1>
-            <span className="text-[10px] text-[#A69F96] uppercase tracking-[0.3em] font-medium">
-              {filteredArtworks.length} {filteredArtworks.length === 1 ? 'Piece' : 'Pieces'}
-            </span>
+            
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] uppercase tracking-[0.2em] text-[#A69F96] font-bold">Sort:</span>
+                <select 
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value)}
+                  className="bg-transparent text-[10px] uppercase tracking-[0.1em] font-bold text-[#2C2926] border-b border-[#E5E1DA] pb-1 cursor-pointer focus:outline-none focus:border-[#2C2926] transition-colors appearance-none pr-4"
+                  // Adds a subtle custom dropdown arrow that matches your aesthetic
+                  style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232C2926%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 top 50%', backgroundSize: '8px auto' }}
+                >
+                  <option value="recent">Added Recently</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                </select>
+              </div>
+
+              <span className="text-[10px] text-[#A69F96] uppercase tracking-[0.3em] font-medium hidden md:inline">
+                {sortedArtworks.length} {sortedArtworks.length === 1 ? 'Piece' : 'Pieces'}
+              </span>
+            </div>
           </div>
 
           {isLoading ? (
@@ -234,7 +264,8 @@ export default function CollectionPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-              {filteredArtworks.map((artwork) => (
+              {/* NOW MAPPING OVER sortedArtworks INSTEAD OF filteredArtworks */}
+              {sortedArtworks.map((artwork) => (
                 <div 
                   key={artwork.id} 
                   className="group cursor-pointer"

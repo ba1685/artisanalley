@@ -72,11 +72,8 @@ export default async function MakersPage() {
                   {maker.artworks.length} {maker.artworks.length === 1 ? 'Piece' : 'Pieces'} in Gallery
                 </p>
                 
+                {/* FIXED: Removed the duplicate bio paragraph */}
                 <p className="text-sm text-[#4A443F] leading-relaxed mb-8 line-clamp-4 px-4">
-                  {maker.bio}
-                </p>
-
-               <p className="text-sm text-[#4A443F] leading-relaxed mb-6 line-clamp-4 px-4">
                   {maker.bio}
                 </p>
 
